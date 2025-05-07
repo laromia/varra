@@ -21,4 +21,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('measures', MeasureController::class);
 
     Route::get('/dashboard-data', [FarmController::class, 'dashboardData']);
+    
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 });

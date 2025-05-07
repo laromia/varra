@@ -55,32 +55,12 @@ protected function authorizeAccess($farm)
 }
 
 public function dashboardData()
-    {
-        $user = Auth::user();
+{
+    $farms = \App\Models\Farm::with([
+        'zones.sensors.latestMeasure'
+    ])->get();
 
-        // Fetch farms and their zones
-        $farms = Farm::where('user_id', $user->id)->with('zones.sensors')->get();
-
-        // Prepare dashboard data (e.g., the latest data for each sensor)
-        $dashboardData = $farms->map(function ($farm) {
-            return [
-                'farm' => $farm,
-                'zones' => $farm->zones->map(function ($zone) {
-                    return [
-                        'zone' => $zone,
-                        'sensors' => $zone->sensors->map(function ($sensor) {
-                            // Get the latest measurement for the sensor
-                            $latestMeasure = $sensor->measures()->latest()->first();
-                            return [
-                                'sensor' => $sensor,
-                                'latest_measurement' => $latestMeasure,
-                            ];
-                        }),
-                    ];
-                }),
-            ];
-        });
-
-        return response()->json($dashboardData);
-    }
+    return response()->json($farms);
+}
+    
 }
