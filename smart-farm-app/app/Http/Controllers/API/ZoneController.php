@@ -74,4 +74,12 @@ class ZoneController extends Controller
         $zone->delete();
         return response()->json(['message' => 'Zone deleted successfully']);
     }
+    public function getSensorData(Zone $zone)
+{
+    return response()->json([
+        'zone' => $zone,
+        'sensors' => $zone->sensors()->with(['latestMeasure'])->get(),
+        'measurements_24h' => $zone->getMeasurements24h()
+    ]);
+}
 }

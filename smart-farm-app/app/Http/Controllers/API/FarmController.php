@@ -54,13 +54,27 @@ protected function authorizeAccess($farm)
     abort_if($farm->user_id !== auth()->id(), 403, 'Unauthorized');
 }
 
-public function dashboardData()
+public function dashboardData(Request $request)
 {
-    $farms = \App\Models\Farm::with([
-        'zones.sensors.latestMeasure'
-    ])->get();
+    $farms = Farm::with(['zones.sensors.latestMeasure'])
+        ->where('user_id', $request->user()->id)
+        ->get();
 
-    return response()->json($farms);
+    return response()->json([
+        'success' => true,
+        'farms' => $farms,
+        'message' => 'Farm data retrieved successfully'
+    ]);
+}
+public function getSensorData(Farm $farm)
+{
+    return response()->json([
+        'farm' => $farm,
+        'zones' => $farm->zones()->with(['sensors' => function($query) {
+            $query->with(['latestMeasure']);
+        }])->get(),
+        'latest_measurements' => $farm->getLatestMeasurements()
+    ]);
 }
     
 }

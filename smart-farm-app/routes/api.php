@@ -7,6 +7,7 @@ use App\Http\Controllers\API\ZoneController;
 use App\Http\Controllers\API\SensorController;
 use App\Http\Controllers\API\MeasureController;
 
+
 // Public auth routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -19,10 +20,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('zones', ZoneController::class);
     Route::apiResource('sensors', SensorController::class);
     Route::apiResource('measures', MeasureController::class);
+    Route::get('/farms/{farm}/sensor-data', [FarmController::class, 'getSensorData']);
+    Route::get('/zones/{zone}/sensor-data', [ZoneController::class, 'getSensorData']);
+    Route::get('/sensors/{sensor}/measurements', [SensorController::class, 'getMeasurements']);
 
-    Route::get('/dashboard-data', [FarmController::class, 'dashboardData']);
+    Route::get('/dashboard-data', [FarmController::class, 'dashboardData'])
+    ->name('api.dashboard.data');
     
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+  
 });
+

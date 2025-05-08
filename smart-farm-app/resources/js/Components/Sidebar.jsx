@@ -53,7 +53,7 @@ export default function Sidebar({ open, onClose }) {
   return (
     <aside className={`fixed inset-y-0 left-0 z-30 w-64 transform bg-white border-r overflow-y-auto transition duration-300 ease-in-out ${open ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0`}>
       <div className="h-full flex flex-col p-4">
-        <h2 className="text-2xl font-semibold text-green-600 mb-8">Smart Farm</h2>
+        <h2 className="text-2xl font-semibold text-green-600 mb-8">Verra Farm</h2>
         <nav className="flex-1 space-y-2">
           {links.map(link => (
             <Link key={link.name} href={link.path} className="flex items-center p-2 text-gray-700 rounded-lg hover:bg-green-50 hover:text-green-600 transition-colors">
