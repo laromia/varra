@@ -28,5 +28,9 @@ class Farm extends Model
     ->limit(100)
     ->get();
 }
+public function plantTypes()
+{
+    return $this->hasManyThrough(PlantType::class, Zone::class);
+}
     
 }

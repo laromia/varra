@@ -14,7 +14,6 @@ class ZoneFactory extends Factory
     {
         return [
             'name' => $this->faker->randomElement(['North', 'South', 'East', 'West']) . ' Field',
-            'crop_type' => $this->faker->randomElement(['Tomatoes', 'Cucumbers', 'Wheat', 'Corn']),
             'farm_id' => Farm::factory(),
         ];
     }

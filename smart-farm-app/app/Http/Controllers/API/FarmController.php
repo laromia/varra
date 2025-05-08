@@ -56,13 +56,12 @@ protected function authorizeAccess($farm)
 
 public function dashboardData(Request $request)
 {
-    $farms = Farm::with(['zones.sensors.latestMeasure'])
-        ->where('user_id', $request->user()->id)
+    $farms = Farm::with(['zones.plantTypes', 'zones.sensors.latestMeasure'])
         ->get();
-
+    
     return response()->json([
         'success' => true,
-        'farms' => $farms,
+        'farms' => $farms,  // Keep same structure
         'message' => 'Farm data retrieved successfully'
     ]);
 }

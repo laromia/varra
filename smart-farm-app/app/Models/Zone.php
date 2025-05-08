@@ -17,5 +17,10 @@ class Zone extends Model
     {
         return $this->hasMany(Sensor::class);
     }
+    public function plantTypes()
+    {
+        return $this->hasMany(PlantType::class);
+    }
+
     
 }

@@ -22,9 +22,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::get('/zones', function () {
-        return inertia('Zones'); // This will return the Zones.jsx component
-    });
+    Route::get('/zones', [\App\Http\Controllers\API\ZoneController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('zones');
 });
 Route::get('/register', function () {
     return Inertia::render('Register');

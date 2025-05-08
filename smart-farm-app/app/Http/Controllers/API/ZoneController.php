@@ -10,10 +10,24 @@ use App\Models\Farm;
 class ZoneController extends Controller
 {
     public function index()
-    {
-        return Zone::with('sensors')->get();
-    }
+{
+    $zones = auth()->user()
+        ->farms()
+        ->with(['zones' => function($query) {
+            $query->with([
+                'farm:id,name',
+                'plantTypes:id,name,zone_id',
+                'sensors.latestMeasure'
+            ]);
+        }])
+        ->get()
+        ->pluck('zones')
+        ->flatten();
 
+    return inertia('Zones', [
+        'zones' => $zones
+    ]);
+}
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -83,3 +97,4 @@ class ZoneController extends Controller
     ]);
 }
 }
+

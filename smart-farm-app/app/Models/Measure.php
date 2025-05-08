@@ -12,5 +12,10 @@ class Measure extends Model
 {
     return $this->belongsTo(Sensor::class);
 }
+public function plantType()
+{
+    return $this->belongsTo(PlantType::class);
+}
+
 
 }

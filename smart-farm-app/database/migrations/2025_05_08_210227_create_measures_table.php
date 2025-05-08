@@ -15,11 +15,11 @@ return new class extends Migration
         $table->id();
         $table->float('value');
         $table->foreignId('sensor_id')->constrained()->onDelete('cascade');
+        $table->foreignId('plant_type_id')->nullable()->constrained()->onDelete('set null'); // add this line
         $table->timestamp('measured_at');
         $table->timestamps();
     });
 }
-
 
     /**
      * Reverse the migrations.
@@ -29,3 +29,4 @@ return new class extends Migration
         Schema::dropIfExists('measures');
     }
 };
+

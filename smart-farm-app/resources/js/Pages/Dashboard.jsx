@@ -320,13 +320,42 @@ export default function Dashboard({ initialFarms, auth_user_id }) {
                                                             className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer"
                                                             onClick={() => toggleZone(zone.id)}
                                                         >
-                                                            <div className="flex items-center">
-                                                                <MapPinIcon className="w-5 h-5 text-blue-500 mr-2" />
-                                                                <h3 className="font-medium">{zone.name}</h3>
-                                                                <span className="ml-2 text-xs text-gray-500">
-                                                                    ({zone.crop_type})
-                                                                </span>
-                                                            </div>
+                                                            <div 
+    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer"
+    onClick={() => toggleZone(zone.id)}
+>
+    <div className="flex items-center flex-wrap gap-2">
+        <h3 className="font-medium">{zone.name}</h3>
+        
+        {/* Plant types display */}
+        {zone.plant_types?.length > 0 ? (
+            zone.plant_types.map((plant) => (
+                <span 
+                    key={plant.id}
+                    className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
+                >
+                    {plant.name}
+                </span>
+            ))
+        ) : (
+            <span className="text-xs text-gray-500">No plants</span>
+        )}
+        
+        {/* Plant count - only show if there are plants */}
+        {zone.plantTypes?.length > 0 && (
+            <span className="ml-2 text-xs text-gray-500">
+                ({zone.plantTypes.length} plants)
+            </span>
+        )}
+    </div>
+    
+    {/* Chevron icon */}
+    <ChevronIcon 
+        className={`w-4 h-4 transform transition-transform ${
+            expandedZone === zone.id ? 'rotate-180' : ''
+        }`}
+    />
+</div>
                                                             <ChevronIcon 
                                                                 className={`w-4 h-4 transform transition-transform ${
                                                                     expandedZone === zone.id ? 'rotate-180' : ''
