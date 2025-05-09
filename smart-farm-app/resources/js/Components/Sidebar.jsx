@@ -3,9 +3,9 @@ import { Link } from '@inertiajs/react';
 
 const links = [
   { name: 'Dashboard', icon: 'dashboard', path: '/dashboard' },
+  { name: 'Field View', icon: 'map', path: '/field-view' }, // Updated
   { name: 'Zones', icon: 'location', path: '/zones' },
-  { name: 'Map', icon: 'map', path: '/map' },
-  { name: 'Analytics', icon: 'chart', path: '/analytics' },
+   { name: 'Map', icon: 'map', path: '/map' },
   { name: 'Settings', icon: 'settings', path: '/settings' },
 ];
 

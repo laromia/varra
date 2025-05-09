@@ -14,9 +14,10 @@ class PlantType extends Model
         'zone_id',
     ];
 
-    public function zone()
-    {
-        return $this->belongsTo(Zone::class);
-    }
+    public function zones()
+{
+    return $this->belongsToMany(Zone::class);
+}
+
 }
 

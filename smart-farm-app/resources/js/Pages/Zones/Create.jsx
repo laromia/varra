@@ -4,10 +4,11 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { ArrowLeftIcon, PlusIcon } from '@/Components/Icons';
 import  { useState } from 'react';
 
-export default function CreateZone({ auth, farms }) {
+export default function CreateZone({ auth, farms, plantTypes}) {
     const [formData, setFormData] = useState({
       name: '',
-      farm_id: farms[0]?.id || ''
+      farm_id: farms[0]?.id || '',
+      plant_type_ids: [] 
     });
     const [processing, setProcessing] = useState(false);
   
@@ -111,6 +112,36 @@ export default function CreateZone({ auth, farms }) {
       <p className="mt-1 text-sm text-red-600">{errors.farm_id}</p>
     )}
   </div>
+  
+  <div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Plant Types
+  </label>
+  <div className="space-y-2">
+    {[...new Map(plantTypes.map(type => [type.name, type])).values()].map((type) => (
+      <label key={type.id} className="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          value={type.id}
+          checked={formData.plant_type_ids.includes(type.id.toString())}
+          onChange={(e) => {
+            const id = e.target.value;
+            const isChecked = e.target.checked;
+            setFormData((prev) => ({
+              ...prev,
+              plant_type_ids: isChecked
+                ? [...prev.plant_type_ids, id]
+                : prev.plant_type_ids.filter((pid) => pid !== id),
+            }));
+          }}
+          className="h-4 w-4 text-green-600 border-gray-300 rounded"
+        />
+        <span className="text-sm text-gray-700">{type.name}</span>
+      </label>
+    ))}
+  </div>
+</div>
+
 
   {/* Form Actions */}
   <div className="flex justify-end space-x-3 pt-4">

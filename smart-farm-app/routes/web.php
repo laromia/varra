@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Models\Farm;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Api\FieldViewController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -38,6 +40,11 @@ Route::get('/dev/seed', function () {
     }
     abort(403);
 });
+Route::get('/map', function () {
+    return Inertia::render('MapView');
+})->middleware(['auth', 'verified']);
+Route::get('/field-view', [FieldViewController::class, 'index'])
+     ->middleware(['auth', 'verified']);
 
 
 require __DIR__.'/auth.php';

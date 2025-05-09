@@ -9,10 +9,11 @@ class Zone extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'name',
-        'farm_id',
-        // Add any other fields you need to mass assign
-    ];
+    'name',
+    'farm_id',
+    'latitude',  // Add these
+    'longitude'  // Add these
+];
     public function farm()
     {
         return $this->belongsTo(Farm::class);
@@ -23,9 +24,8 @@ class Zone extends Model
         return $this->hasMany(Sensor::class);
     }
     public function plantTypes()
-    {
-        return $this->hasMany(PlantType::class);
-    }
-
+{
+    return $this->belongsToMany(PlantType::class);
+}
     
 }
