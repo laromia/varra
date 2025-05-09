@@ -25,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/zones/{zone}/sensor-data', [ZoneController::class, 'getSensorData']);
     Route::get('/sensors/{sensor}/measurements', [SensorController::class, 'getMeasurements']);
     Route::get('/plant-types', [plantController::class, 'getPlantTypes']);
+    Route::delete('/zones/{zone}', [ZoneController::class, 'destroy']);
 
     Route::get('/dashboard-data', [FarmController::class, 'dashboardData'])
     ->name('api.dashboard.data');

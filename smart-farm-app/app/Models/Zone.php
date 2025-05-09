@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Zone extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'name',
+        'farm_id',
+        // Add any other fields you need to mass assign
+    ];
     public function farm()
     {
         return $this->belongsTo(Farm::class);

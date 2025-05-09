@@ -10,42 +10,27 @@ use App\Models\Farm;
 class ZoneController extends Controller
 {
     public function index()
-{
-    $zones = auth()->user()
-        ->farms()
-        ->with(['zones' => function($query) {
-            $query->with([
-                'farm:id,name',
-                'plantTypes:id,name,zone_id',
-                'sensors.latestMeasure'
-            ]);
-        }])
-        ->get()
-        ->pluck('zones')
-        ->flatten();
-
-    return inertia('Zones', [
-        'zones' => $zones
-    ]);
-}
-    public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'crop_type' => 'nullable|string|max:255',
-            'farm_id' => 'required|exists:farms,id',
+        $zones = auth()->user()
+            ->farms()
+            ->with(['zones' => function($query) {
+                $query->with([
+                    'farm:id,name',
+                    'plantTypes:id,name,zone_id',
+                    'sensors.latestMeasure'
+                ]);
+            }])
+            ->get()
+            ->pluck('zones')
+            ->flatten();
+    
+        return inertia('Zones', [
+            'zones' => $zones,
+            'auth' => [  // Add this
+                'user' => auth()->user()->only('id', 'name', 'email')
+            ]
         ]);
-
-        // Optional: Ensure the farm belongs to the authenticated user
-        $farm = Farm::findOrFail($data['farm_id']);
-        if ($farm->user_id !== auth()->id()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $zone = Zone::create($data);
-        return response()->json($zone, 201);
     }
-
     public function show($id)
     {
         $zone = Zone::with('sensors.measures')->findOrFail($id);
@@ -58,36 +43,40 @@ class ZoneController extends Controller
         return response()->json($zone);
     }
 
-    public function update(Request $request, $id)
-    {
-        $zone = Zone::findOrFail($id);
-        $farm = $zone->farm;
+    public function create()
+{
+    return inertia('Zones/Create', [
+        'farms' => auth()->user()->farms,
+        'flash' => [
+            'success' => session('success'),
+            'error' => session('errors') ? session('errors')->first() : null
+        ]
+    ]);
+}
+    
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'farm_id' => 'required|exists:farms,id,user_id,'.auth()->id()
+    ]);
 
-        if ($farm->user_id !== auth()->id()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+    Zone::create($validated);
 
-        $data = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'crop_type' => 'nullable|string|max:255',
-        ]);
-
-        $zone->update($data);
-        return response()->json($zone);
+    return redirect()->route('zones.index')
+        ->with('success', 'Zone created successfully!');
+}
+    public function destroy(Zone $zone)
+{
+    // Verify zone belongs to user's farm
+    if ($zone->farm->user_id !== auth()->id()) {
+        abort(403, 'Unauthorized');
     }
 
-    public function destroy($id)
-    {
-        $zone = Zone::findOrFail($id);
-        $farm = $zone->farm;
-
-        if ($farm->user_id !== auth()->id()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $zone->delete();
-        return response()->json(['message' => 'Zone deleted successfully']);
-    }
+    $zone->delete();
+    
+    return response()->noContent(); // Return 204 status
+}
     public function getSensorData(Zone $zone)
 {
     return response()->json([

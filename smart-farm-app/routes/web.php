@@ -26,6 +26,8 @@ Route::middleware('auth')->group(function () {
     ->middleware(['auth', 'verified'])
     ->name('zones');
 });
+Route::get('/zones/create', [\App\Http\Controllers\API\ZoneController::class, 'create'])->name('zones.create');
+    Route::post('/zones', [\App\Http\Controllers\API\ZoneController::class, 'store'])->name('zones.store');
 Route::get('/register', function () {
     return Inertia::render('Register');
 });
