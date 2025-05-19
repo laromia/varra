@@ -60,28 +60,29 @@ class ZoneController extends Controller
     }
 
     public function store(Request $request)
-    {
-        // Validate the form input
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'farm_id' => 'required|exists:farms,id',
-            'plant_type_ids' => 'nullable|array',
-            'plant_type_ids.*' => 'exists:plant_types,id',
-        ]);
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'farm_id' => 'required|exists:farms,id',
+        'latitude' => 'nullable|numeric',
+        'longitude' => 'nullable|numeric',
+        'plant_type_ids' => 'nullable|array',
+        'plant_type_ids.*' => 'exists:plant_types,id',
+    ]);
 
-        // Create the Zone
-        $zone = Zone::create([
-            'name' => $validated['name'],
-            'farm_id' => $validated['farm_id'],
-        ]);
+    $zone = Zone::create([
+        'name' => $validated['name'],
+        'farm_id' => $validated['farm_id'],
+        'latitude' => $validated['latitude'] ?? null,
+        'longitude' => $validated['longitude'] ?? null,
+    ]);
 
-        // Sync plant types if provided
-        if (!empty($validated['plant_type_ids'])) {
-            $zone->plantTypes()->sync($validated['plant_type_ids']);
-        }
-
-        return redirect()->route('zones.index')->with('success', 'Zone created successfully.');
+    if (!empty($validated['plant_type_ids'])) {
+        $zone->plantTypes()->sync($validated['plant_type_ids']);
     }
+
+    return redirect()->route('zones.index')->with('success', 'Zone created successfully.');
+}
 
     public function destroy(Zone $zone)
     {
