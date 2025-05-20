@@ -38,6 +38,10 @@ class HandleInertiaRequests extends Middleware
                     // Add other user fields as needed
                 ] : null
             ],
+            'flash' => [
+            'success' => fn () => $request->session()->get('success'),
+            'error' => fn () => $request->session()->get('error'),
+        ],
         ]);
     }
 }

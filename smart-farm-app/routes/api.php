@@ -19,11 +19,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('farms', FarmController::class);
     Route::apiResource('zones', ZoneController::class);
-    Route::apiResource('sensors', SensorController::class);
+    Route::apiResource('sensors', \App\Http\Controllers\SensorController::class);
     Route::apiResource('measures', MeasureController::class);
     Route::get('/farms/{farm}/sensor-data', [FarmController::class, 'getSensorData']);
     Route::get('/zones/{zone}/sensor-data', [ZoneController::class, 'getSensorData']);
-    Route::get('/sensors/{sensor}/measurements', [SensorController::class, 'getMeasurements']);
+    Route::get('/sensors/{sensor}/measurements', [\App\Http\Controllers\SensorController::class, 'getMeasurements']);
     Route::get('/plant-types', [plantController::class, 'getPlantTypes']);
     Route::delete('/zones/{zone}', [ZoneController::class, 'destroy']);
 
