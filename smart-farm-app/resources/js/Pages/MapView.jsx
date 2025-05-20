@@ -2,23 +2,21 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Link, Head, usePage } from '@inertiajs/react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import { ArrowLeftIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, ExclamationTriangleIcon, MapPinIcon, ClockIcon } from '@heroicons/react/24/outline';
 import 'leaflet/dist/leaflet.css';
 
-// Custom marker icons with better visibility
-const createCustomIcon = (color) => new L.Icon({
-  iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
-const icons = {
-  good: createCustomIcon('green'),
-  warning: createCustomIcon('orange'),
-  alert: createCustomIcon('red')
+// Custom marker icons with modern styling
+const createCustomIcon = (status) => {
+  return new L.Icon({
+    iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${
+      status === 'alert' ? 'red' : status === 'warning' ? 'orange' : 'green'
+    }.png`,
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconSize: [30, 46],
+    iconAnchor: [15, 46],
+    popupAnchor: [1, -40],
+    shadowSize: [46, 46]
+  });
 };
 
 export default function MapView() {
@@ -48,24 +46,18 @@ export default function MapView() {
   };
 
   const getFarmWarnings = (farm) => {
-    const warnings = [];
-    
-    farm.zones?.forEach(zone => {
-      zone.sensors?.forEach(sensor => {
+    return farm.zones?.flatMap(zone => 
+      zone.sensors?.filter(sensor => {
         const status = getSensorStatus(sensor);
-        if (status !== 'good') {
-          warnings.push({
-            zone: zone.name,
-            sensor: sensor.type,
-            value: sensor.latest_measure?.value,
-            status,
-            timestamp: sensor.latest_measure?.measured_at
-          });
-        }
-      });
-    });
-    
-    return warnings;
+        return status !== 'good';
+      }).map(sensor => ({
+        zone: zone.name,
+        sensor: sensor.type,
+        value: sensor.latest_measure?.value,
+        status,
+        timestamp: sensor.latest_measure?.measured_at
+      }))
+    ) || [];
   };
 
   if (!farms.length) {
@@ -73,16 +65,18 @@ export default function MapView() {
       <AuthenticatedLayout user={auth.user}>
         <Head title="Farm Maps" />
         <div className="max-w-7xl mx-auto p-6">
-          <div className="bg-white rounded-xl shadow-sm p-8 text-center border border-gray-200">
-            <ExclamationTriangleIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-4 text-lg font-medium text-gray-900">No farms available</h3>
-            <p className="mt-2 text-sm text-gray-500">
-              You need to create farms first to view them on the map.
+          <div className="bg-white rounded-2xl shadow-lg p-8 text-center border border-gray-100">
+            <div className="mx-auto h-20 w-20 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+              <MapPinIcon className="h-10 w-10 text-blue-500" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800">No Farms Available</h3>
+            <p className="mt-2 text-gray-600 max-w-md mx-auto">
+              Get started by creating your first farm to monitor your agricultural operations.
             </p>
             <div className="mt-6">
               <Link
                 href="/farms/create"
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="inline-flex items-center px-6 py-3 rounded-xl text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-md transition-all"
               >
                 Create New Farm
               </Link>
@@ -100,18 +94,15 @@ export default function MapView() {
       <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-8">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Farm Monitoring Map</h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Real-time visualization of your farm zones and sensor data
-            </p>
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-gray-900">Farm Field Monitoring</h1>
           </div>
           
           <Link 
             href="/dashboard" 
-            className="group flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white border border-gray-200 hover:border-blue-300 shadow-xs hover:shadow-sm transition-all duration-200"
+            className="group flex items-center gap-2 px-4 py-3 rounded-xl bg-white border border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md transition-all"
           >
-            <ArrowLeftIcon className="w-5 h-5 text-blue-600 group-hover:text-blue-700 transition-colors" />
+            <ArrowLeftIcon className="w-5 h-5 text-blue-500 group-hover:text-blue-700 transition-colors" />
             <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700 transition-colors">
               Back to Dashboard
             </span>
@@ -119,22 +110,22 @@ export default function MapView() {
         </div>
 
         {/* Status Legend */}
-        <div className="flex flex-wrap gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-green-500"></div>
-            <span className="text-sm">Normal</span>
+        <div className="flex flex-wrap gap-3 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex items-center gap-2 px-3 py-2 bg-green-50 rounded-lg">
+            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            <span className="text-sm font-medium">Normal</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-yellow-500"></div>
-            <span className="text-sm">Warning</span>
+          <div className="flex items-center gap-2 px-3 py-2 bg-yellow-50 rounded-lg">
+            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <span className="text-sm font-medium">Warning</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-red-500"></div>
-            <span className="text-sm">Critical</span>
+          <div className="flex items-center gap-2 px-3 py-2 bg-red-50 rounded-lg">
+            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+            <span className="text-sm font-medium">Critical</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-gray-500"></div>
-            <span className="text-sm">No Data</span>
+          <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
+            <div className="w-3 h-3 rounded-full bg-gray-500"></div>
+            <span className="text-sm font-medium">No Data</span>
           </div>
         </div>
 
@@ -146,16 +137,19 @@ export default function MapView() {
             const defaultLocation = hasZones ? farm.zones[0].location : [0, 0];
             
             return (
-              <div key={farm.id} className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition duration-300">
+              <div key={farm.id} className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-all">
                 {/* Farm Header */}
-                <div className="p-5 border-b border-gray-200">
+                <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h2 className="text-lg font-bold text-gray-800">{farm.name}</h2>
-                      <p className="text-sm text-gray-500">{farm.location || 'No location specified'}</p>
+                      <h2 className="text-xl font-bold text-gray-800">{farm.name}</h2>
+                      <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                        <MapPinIcon className="w-4 h-4" />
+                        {farm.location || 'Location not specified'}
+                      </p>
                     </div>
                     {farmWarnings.length > 0 && (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 border border-red-200">
                         <ExclamationTriangleIcon className="w-4 h-4 mr-1" />
                         {farmWarnings.length} alert{farmWarnings.length > 1 ? 's' : ''}
                       </span>
@@ -165,34 +159,39 @@ export default function MapView() {
 
                 {/* Warnings Summary */}
                 {farmWarnings.length > 0 && (
-                  <div className="p-4 bg-gray-50 border-b border-gray-200">
-                    <h3 className="text-sm font-medium text-gray-700 mb-2">Current Alerts</h3>
-                    <div className="space-y-2">
+                  <div className="p-4 bg-gray-50 border-b border-gray-100">
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">Active Alerts</h3>
+                    <div className="space-y-3">
                       {farmWarnings.slice(0, 3).map((warning, index) => (
                         <div 
                           key={index} 
-                          className={`p-2 rounded-md ${
-                            warning.status === 'alert' ? 'bg-red-50 border-l-4 border-red-500' :
-                            'bg-yellow-50 border-l-4 border-yellow-500'
+                          className={`p-3 rounded-lg ${
+                            warning.status === 'alert' ? 
+                              'bg-gradient-to-r from-red-50 to-white border-l-4 border-red-500' :
+                              'bg-gradient-to-r from-yellow-50 to-white border-l-4 border-yellow-500'
                           }`}
                         >
                           <div className="flex justify-between items-start">
                             <div>
                               <span className="font-medium">{warning.zone}</span>
-                              <span className="text-xs text-gray-500 ml-2">{warning.sensor}</span>
+                              <span className="text-xs text-gray-500 ml-2 capitalize">{warning.sensor.replace('_', ' ')}</span>
                             </div>
-                            <span className="font-semibold">
+                            <span className={`font-semibold ${
+                              warning.status === 'alert' ? 'text-red-600' : 'text-yellow-600'
+                            }`}>
                               {warning.value}
                               {warning.sensor === 'temperature' ? '°C' : '%'}
                             </span>
                           </div>
-                          <div className="text-xs text-gray-500 mt-1">
-                            {warning.timestamp || 'No timestamp'}
-                          </div>
+                          {warning.timestamp && (
+                            <div className="text-xs text-gray-400 mt-1">
+                              {new Date(warning.timestamp).toLocaleTimeString()}
+                            </div>
+                          )}
                         </div>
                       ))}
                       {farmWarnings.length > 3 && (
-                        <div className="text-center text-sm text-gray-500">
+                        <div className="text-center text-sm text-gray-500 pt-1">
                           +{farmWarnings.length - 3} more alerts
                         </div>
                       )}
@@ -201,13 +200,13 @@ export default function MapView() {
                 )}
 
                 {/* Map Container */}
-                <div className="h-64 w-full relative">
+                <div className="h-80 w-full relative">
                   {hasZones ? (
                     <MapContainer
                       center={defaultLocation}
                       zoom={14}
-                      style={{ height: '100%', width: '100%' }}
-                      scrollWheelZoom={false}
+                      style={{ height: '100%', width: '100%', borderRadius: '0 0 12px 12px' }}
+                      scrollWheelZoom={true}
                     >
                       <TileLayer
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -221,19 +220,24 @@ export default function MapView() {
                           <Marker 
                             key={zone.id} 
                             position={zone.location}
-                            icon={icons[zoneStatus]}
+                            icon={createCustomIcon(zoneStatus)}
                           >
-                            <Popup className="custom-popup min-w-[200px]">
-                              <div className="space-y-2">
-                                <h4 className="font-bold text-lg">{zone.name}</h4>
-                                <div className="text-sm text-gray-500">Farm: {farm.name}</div>
+                            <Popup className="custom-popup min-w-[240px] rounded-xl overflow-hidden shadow-xl border border-gray-200">
+                              <div className="space-y-3">
+                                <div className="bg-gradient-to-r from-blue-600 to-blue-500 p-3 -mx-3 -mt-3">
+                                  <h4 className="font-bold text-lg text-white">{zone.name}</h4>
+                                  <div className="text-sm text-blue-100">Farm: {farm.name}</div>
+                                </div>
                                 
                                 {zone.plant_types?.length > 0 && (
-                                  <div className="mt-2">
-                                    <h5 className="font-medium text-sm">Plant Types:</h5>
-                                    <div className="flex flex-wrap gap-1 mt-1">
+                                  <div>
+                                    <h5 className="font-medium text-sm text-gray-700 mb-2">Plant Types</h5>
+                                    <div className="flex flex-wrap gap-2">
                                       {zone.plant_types.map(plant => (
-                                        <span key={plant.id} className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                                        <span 
+                                          key={plant.id} 
+                                          className="text-xs bg-green-50 text-green-800 px-3 py-1 rounded-full border border-green-200"
+                                        >
                                           {plant.name}
                                         </span>
                                       ))}
@@ -242,30 +246,30 @@ export default function MapView() {
                                 )}
 
                                 {zone.sensors?.length > 0 && (
-                                  <div className="mt-2">
-                                    <h5 className="font-medium text-sm">Sensors:</h5>
-                                    <div className="space-y-1 mt-1">
+                                  <div>
+                                    <h5 className="font-medium text-sm text-gray-700 mb-2">Sensor Readings</h5>
+                                    <div className="space-y-2">
                                       {zone.sensors.map(sensor => {
                                         const status = getSensorStatus(sensor);
                                         return (
                                           <div 
                                             key={sensor.id} 
-                                            className={`text-xs px-2 py-1 rounded ${
-                                              status === 'alert' ? 'bg-red-100 text-red-800' :
-                                              status === 'warning' ? 'bg-yellow-100 text-yellow-800' :
-                                              'bg-green-100 text-green-800'
+                                            className={`px-3 py-2 rounded-lg ${
+                                              status === 'alert' ? 'bg-red-50 text-red-800 border border-red-200' :
+                                              status === 'warning' ? 'bg-yellow-50 text-yellow-800 border border-yellow-200' :
+                                              'bg-green-50 text-green-800 border border-green-200'
                                             }`}
                                           >
-                                            <div className="flex justify-between">
-                                              <span className="capitalize">{sensor.type}</span>
-                                              <span className="font-medium">
+                                            <div className="flex justify-between items-center">
+                                              <span className="capitalize font-medium">{sensor.type.replace('_', ' ')}</span>
+                                              <span className="font-semibold">
                                                 {sensor.latest_measure?.value || '--'}
                                                 {sensor.type === 'temperature' ? '°C' : '%'}
                                               </span>
                                             </div>
                                             {sensor.latest_measure?.measured_at && (
-                                              <div className="text-[0.65rem] text-gray-500 mt-0.5">
-                                                {new Date(sensor.latest_measure.measured_at).toLocaleString()}
+                                              <div className="text-xs text-gray-500 mt-1">
+                                                {new Date(sensor.latest_measure.measured_at).toLocaleTimeString()}
                                               </div>
                                             )}
                                           </div>
@@ -282,13 +286,18 @@ export default function MapView() {
                     </MapContainer>
                   ) : (
                     <div className="h-full flex flex-col items-center justify-center bg-gray-50 text-gray-500 p-4">
-                      <ExclamationTriangleIcon className="w-8 h-8 mb-2" />
-                      <p>No zones with coordinates found</p>
+                      <div className="p-3 bg-white rounded-full mb-3 shadow-sm">
+                        <ExclamationTriangleIcon className="w-6 h-6 text-yellow-500" />
+                      </div>
+                      <p className="text-center">No zones with coordinates found</p>
                       <Link 
                         href={`/farms/${farm.id}/edit`} 
-                        className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+                        className="mt-3 text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
                       >
-                        Add zones to this farm
+                        <span>Add zones to this farm</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
                       </Link>
                     </div>
                   )}

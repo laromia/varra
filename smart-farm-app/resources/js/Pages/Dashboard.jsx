@@ -5,27 +5,12 @@ import Sidebar from '@/Components/Sidebar';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import axios from 'axios';
 
-// Icon Components
+// Icons
 const FarmIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-  </svg>
-);
-
-const MapIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-  </svg>
-);
-
-const ActivityIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
   </svg>
 );
 
@@ -35,22 +20,9 @@ const AlertIcon = () => (
   </svg>
 );
 
-const SunIcon = () => (
+const ClockIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-  </svg>
-);
-
-const DropletIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-  </svg>
-);
-
-const MapPinIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 );
 
@@ -60,63 +32,28 @@ const ChevronIcon = ({ className }) => (
   </svg>
 );
 
-const ThermometerIcon = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-  </svg>
-);
-
-const PlantIcon = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-  </svg>
-);
-
-// Helper Components
-const StatusCard = ({ title, value, icon, color }) => (
-  <div className={`p-4 rounded-xl ${color} flex items-center justify-between`}>
-    <div>
-      <p className="text-sm font-medium">{title}</p>
-      <p className="text-2xl font-bold">{value}</p>
-    </div>
-    <div className="p-2 rounded-full bg-white bg-opacity-30">
-      {icon}
-    </div>
-  </div>
-);
-
-const SensorCard = ({ type, value, timestamp, status }) => {
-  const icons = {
-    temperature: <ThermometerIcon className="w-5 h-5 text-red-500" />,
-    humidity: <DropletIcon className="w-5 h-5 text-blue-500" />,
-    soil_moisture: <PlantIcon className="w-5 h-5 text-green-500" />
+const StatusPill = ({ status }) => {
+  const statusClasses = {
+    normal: 'bg-green-100 text-green-800 border border-green-200',
+    warning: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+    alert: 'bg-red-100 text-red-800 border border-red-200'
   };
-
-  const statusColors = {
-    normal: 'bg-green-100 text-green-800',
-    warning: 'bg-yellow-100 text-yellow-800',
-    alert: 'bg-red-100 text-red-800'
-  };
-
+  
   return (
-    <div className="bg-white p-3 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          {icons[type] || <ActivityIcon className="w-5 h-5 text-gray-500" />}
-          <span className="ml-2 text-sm capitalize">{type.replace('_', ' ')}</span>
-        </div>
-        <span className={`text-xs px-2 py-1 rounded-full ${statusColors[status]}`}>
-          {status}
-        </span>
-      </div>
-      <div className="mt-2">
-        <p className="text-xl font-semibold">
-          {value || '--'} {type === 'temperature' ? '°C' : '%'}
-        </p>
-        <p className="text-xs text-gray-500 mt-1">
-          {timestamp ? new Date(timestamp).toLocaleString() : 'No data'}
-        </p>
-      </div>
+    <span className={`text-xs px-2 py-1 rounded-full ${statusClasses[status]}`}>
+      {status}
+    </span>
+  );
+};
+
+const SensorValue = ({ sensor }) => {
+  const value = sensor.latest_measure?.value || '--';
+  const unit = sensor.type === 'temperature' ? '°C' : '%';
+  
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-lg font-semibold">{value}{unit}</span>
+      <StatusPill status={getSensorStatus(sensor)} />
     </div>
   );
 };
@@ -138,275 +75,256 @@ const getSensorStatus = (sensor) => {
 };
 
 export default function Dashboard({ initialFarms, auth_user_id }) {
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [weather, setWeather] = useState(null);
-    const [farms, setFarms] = useState(initialFarms ?? []);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const farmPosition = [35.6895, 139.6917];
-    const [expandedFarm, setExpandedFarm] = useState(null);
-    const [expandedZone, setExpandedZone] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [farms, setFarms] = useState(initialFarms ?? []);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [expandedFarm, setExpandedFarm] = useState(null);
+  const [activeTab, setActiveTab] = useState('overview');
 
-    const toggleFarm = (farmId) => {
-        setExpandedFarm(expandedFarm === farmId ? null : farmId);
-        setExpandedZone(null);
-    };
+  // Update time every second
+ 
 
-    const toggleZone = (zoneId) => {
-        setExpandedZone(expandedZone === zoneId ? null : zoneId);
-    };
+  const fetchLatestData = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get('/api/dashboard-data');
+      setFarms(response.data.farms);
+    } catch (err) {
+      console.error('Error fetching data:', err);
+      setError('Failed to load latest farm data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    const fetchLatestData = async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-            const response = await axios.get('/api/dashboard-data');
-            setFarms(response.data.farms);
-        } catch (err) {
-            console.error('Error fetching data:', err);
-            setError('Failed to load latest farm data');
-        } finally {
-            setIsLoading(false);
-        }
-    };
+  useEffect(() => {
+    fetchLatestData();
+    const dataInterval = setInterval(fetchLatestData, 30000);
+    return () => clearInterval(dataInterval);
+  }, []);
 
-    const fetchWeatherData = async () => {
-        try {
-            const response = await fetch(
-                'https://api.open-meteo.com/v1/forecast?latitude=35.68&longitude=10.1&current=temperature_2m,relative_humidity_2m&timezone=auto'
-            );
-            const data = await response.json();
-            if (data?.current) {
-                setWeather({
-                    temperature: data.current.temperature_2m,
-                    humidity: data.current.relative_humidity_2m,
-                });
-            }
-        } catch (err) {
-            console.error('Error fetching weather:', err);
-        }
-    };
+  // Custom map icons
+  delete L.Icon.Default.prototype._getIconUrl;
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  });
 
-    useEffect(() => {
-        fetchWeatherData();
-        fetchLatestData();
-        
-        const dataInterval = setInterval(fetchLatestData, 30000);
-        const weatherInterval = setInterval(fetchWeatherData, 3600000);
-        
-        return () => {
-            clearInterval(dataInterval);
-            clearInterval(weatherInterval);
-        };
-    }, []);
+  // Count alerts across all farms
+  const alertCount = farms.reduce((count, farm) => {
+    return count + farm.zones.reduce((zoneCount, zone) => {
+      return zoneCount + zone.sensors.filter(sensor => {
+        const status = getSensorStatus(sensor);
+        return status === 'alert' || status === 'warning';
+      }).length;
+    }, 0);
+  }, 0);
 
-    delete L.Icon.Default.prototype._getIconUrl;
-    L.Icon.Default.mergeOptions({
-        iconRetinaUrl: markerIcon2x,
-        iconUrl: markerIcon,
-        shadowUrl: markerShadow,
-    });
-
-    return (
-        <>
-            <Head title="Dashboard" />
-            <div className="flex h-screen bg-gray-50">
-                {sidebarOpen && (
-                    <div
-                        className="fixed inset-0 z-20 bg-black bg-opacity-50 transition-opacity"
-                        onClick={() => setSidebarOpen(false)}
-                    />
-                )}
-
-                <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
-                <div className="flex-1 flex flex-col overflow-auto">
-                    <AuthenticatedLayout
-                        header={
-                            <div className="flex items-center justify-between p-4 bg-white shadow-sm">
-                                <h1 className="text-2xl font-bold text-gray-800">Farm Monitoring</h1>
-                                {weather && (
-                                    <div className="flex items-center gap-4 bg-blue-50 px-4 py-2 rounded-lg">
-                                        <span className="flex items-center gap-1">
-                                            <SunIcon />
-                                            {weather.temperature}°C
-                                        </span>
-                                        <span className="flex items-center gap-1">
-                                            <DropletIcon />
-                                            {weather.humidity}%
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-                        }
-                    >
-                        <div className="p-6 overflow-y-auto">
-                            {isLoading && (
-                                <div className="mb-4 p-3 bg-blue-50 text-blue-700 rounded-md flex items-center">
-                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    Loading latest farm data...
-                                </div>
-                            )}
-
-                            {error && (
-                                <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md">
-                                    {error}
-                                </div>
-                            )}
-
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                                <StatusCard 
-                                    title="Total Farms" 
-                                    value={farms.length} 
-                                    icon={<FarmIcon />}
-                                    color="bg-green-100 text-green-800"
-                                />
-                                <StatusCard 
-                                    title="Active Zones" 
-                                    value={farms.reduce((sum, farm) => sum + farm.zones.length, 0)} 
-                                    icon={<MapIcon />}
-                                    color="bg-blue-100 text-blue-800"
-                                />
-                                <StatusCard 
-                                    title="Sensors Online" 
-                                    value={farms.reduce((sum, farm) => sum + farm.zones.reduce((zSum, zone) => zSum + zone.sensors.length, 0), 0)} 
-                                    icon={<ActivityIcon />}
-                                    color="bg-purple-100 text-purple-800"
-                                />
-                                <StatusCard 
-                                    title="Alerts" 
-                                    value={farms.reduce((sum, farm) => {
-                                        return sum + farm.zones.reduce((zSum, zone) => {
-                                            return zSum + zone.sensors.filter(sensor => {
-                                                const status = getSensorStatus(sensor);
-                                                return status === 'alert' || status === 'warning';
-                                            }).length;
-                                        }, 0);
-                                    }, 0)}
-                                    icon={<AlertIcon />}
-                                    color="bg-red-100 text-red-800"
-                                />
-                            </div>
-
-                            <div className="space-y-4">
-                                {farms.map(farm => (
-                                    <div key={farm.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
-                                        <div 
-                                            className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50"
-                                            onClick={() => toggleFarm(farm.id)}
-                                        >
-                                            <div className="flex items-center">
-                                                <FarmIcon className="w-6 h-6 text-green-500 mr-3" />
-                                                <h2 className="text-lg font-semibold">{farm.name}</h2>
-                                                <span className="ml-2 text-sm text-gray-500">
-                                                    ({farm.zones.length} zones)
-                                                </span>
-                                            </div>
-                                            <ChevronIcon 
-                                                className={`w-5 h-5 transform transition-transform ${
-                                                    expandedFarm === farm.id ? 'rotate-180' : ''
-                                                }`}
-                                            />
-                                        </div>
-
-                                        {expandedFarm === farm.id && (
-                                            <div className="border-t border-gray-100 p-4">
-                                                {farm.zones.map(zone => (
-                                                    <div key={zone.id} className="mb-4 last:mb-0">
-                                                        <div 
-                                                            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer"
-                                                            onClick={() => toggleZone(zone.id)}
-                                                        >
-                                                            <div 
-    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer"
-    onClick={() => toggleZone(zone.id)}
->
-    <div className="flex items-center flex-wrap gap-2">
-        <h3 className="font-medium">{zone.name}</h3>
-        
-        {/* Plant types display */}
-        {zone.plant_types?.length > 0 ? (
-            zone.plant_types.map((plant) => (
-                <span 
-                    key={plant.id}
-                    className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
-                >
-                    {plant.name}
-                </span>
-            ))
-        ) : (
-            <span className="text-xs text-gray-500">No plants</span>
+  return (
+    <>
+      <Head title="Farm Dashboard" />
+      <div className="flex h-screen bg-gray-50">
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 z-20 bg-black bg-opacity-50 transition-opacity"
+            onClick={() => setSidebarOpen(false)}
+          />
         )}
-        
-        {/* Plant count - only show if there are plants */}
-        {zone.plantTypes?.length > 0 && (
-            <span className="ml-2 text-xs text-gray-500">
-                ({zone.plantTypes.length} plants)
-            </span>
-        )}
-    </div>
-    
-    {/* Chevron icon */}
-    <ChevronIcon 
-        className={`w-4 h-4 transform transition-transform ${
-            expandedZone === zone.id ? 'rotate-180' : ''
-        }`}
-    />
-</div>
-                                                            <ChevronIcon 
-                                                                className={`w-4 h-4 transform transition-transform ${
-                                                                    expandedZone === zone.id ? 'rotate-180' : ''
-                                                                }`}
-                                                            />
-                                                        </div>
 
-                                                        {expandedZone === zone.id && (
-                                                            <div className="mt-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-2">
-                                                                {zone.sensors.map(sensor => (
-                                                                    <SensorCard 
-                                                                        key={sensor.id}
-                                                                        type={sensor.type}
-                                                                        value={sensor.latest_measure?.value}
-                                                                        timestamp={sensor.latest_measure?.created_at}
-                                                                        status={getSensorStatus(sensor)}
-                                                                    />
-                                                                ))}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-                            {expandedFarm && (
-                                <div className="mt-8">
-                                    <h3 className="text-lg font-semibold mb-3">Farm Location</h3>
-                                    <MapContainer
-                                        center={farmPosition}
-                                        zoom={14}
-                                        className="h-64 w-full rounded-lg shadow-md border border-gray-200"
-                                    >
-                                        <TileLayer
-                                            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-                                        />
-                                        <Marker position={farmPosition}>
-                                            <Popup>
-                                                {farms.find(f => f.id === expandedFarm)?.name}
-                                            </Popup>
-                                        </Marker>
-                                    </MapContainer>
-                                </div>
-                            )}
-                        </div>
-                    </AuthenticatedLayout>
+        <div className="flex-1 flex flex-col overflow-auto">
+          <AuthenticatedLayout
+            header={
+              <div className="flex items-center justify-between p-4 bg-white shadow-sm border-b border-green-100">
+                <h1 className="text-2xl font-bold text-green-800">Farm Dashboard</h1>
+                <div className="flex items-center gap-4">
+                  {alertCount > 0 && (
+                    <div className="flex items-center gap-2 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">
+                      <AlertIcon className="text-red-600" />
+                      <span className="font-medium text-red-800">
+                        {alertCount} alert{alertCount !== 1 ? 's' : ''} detected
+                      </span>
+                    </div>
+                  )}
                 </div>
+              </div>
+            }
+          >
+            <div className="p-6 overflow-y-auto">
+              {/* Tabs */}
+              <div className="flex border-b border-gray-200 mb-6">
+                <button
+                  className={`py-2 px-4 font-medium text-sm ${activeTab === 'overview' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-500 hover:text-gray-700'}`}
+                  onClick={() => setActiveTab('overview')}
+                >
+                  Overview
+                </button>
+                <button
+                  className={`py-2 px-4 font-medium text-sm ${activeTab === 'map' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-500 hover:text-gray-700'}`}
+                  onClick={() => setActiveTab('map')}
+                >
+                  Map View
+                </button>
+              </div>
+
+              {isLoading && (
+                <div className="mb-4 p-3 bg-green-50 text-green-700 rounded-md flex items-center border border-green-100">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Loading latest farm data...
+                </div>
+              )}
+
+              {error && (
+                <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md border border-red-100">
+                  {error}
+                </div>
+              )}
+
+              {activeTab === 'overview' ? (
+                <div className="space-y-4">
+                  {farms.map(farm => {
+                    const farmAlerts = farm.zones.reduce((count, zone) => {
+                      return count + zone.sensors.filter(sensor => {
+                        const status = getSensorStatus(sensor);
+                        return status === 'alert' || status === 'warning';
+                      }).length;
+                    }, 0);
+
+                    return (
+                      <div key={farm.id} className="bg-white rounded-xl shadow-sm overflow-hidden border border-green-50 hover:shadow-md transition-shadow">
+                        <div 
+                          className="flex items-center justify-between p-4 cursor-pointer hover:bg-green-50 transition-colors"
+                          onClick={() => setExpandedFarm(expandedFarm === farm.id ? null : farm.id)}
+                        >
+                          <div className="flex items-center">
+                            <FarmIcon className="w-6 h-6 text-green-500 mr-3" />
+                            <h2 className="text-lg font-semibold text-green-800">{farm.name}</h2>
+                            {farmAlerts > 0 && (
+                              <span className="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                                {farmAlerts} alert{farmAlerts !== 1 ? 's' : ''}
+                              </span>
+                            )}
+                          </div>
+                          <ChevronIcon 
+                            className={`w-5 h-5 text-green-500 transform transition-transform ${
+                              expandedFarm === farm.id ? 'rotate-180' : ''
+                            }`}
+                          />
+                        </div>
+
+                        {expandedFarm === farm.id && (
+                          <div className="border-t border-green-100 p-4 bg-green-50 bg-opacity-30">
+                            {farm.zones.map(zone => {
+                              const zoneAlerts = zone.sensors.filter(sensor => {
+                                const status = getSensorStatus(sensor);
+                                return status === 'alert' || status === 'warning';
+                              });
+
+                              if (zoneAlerts.length === 0) return null;
+
+                              return (
+                                <div key={zone.id} className="mb-4 last:mb-0">
+                                  <h3 className="font-medium mb-2 text-green-700">{zone.name}</h3>
+                                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    {zone.sensors
+                                      .filter(sensor => {
+                                        const status = getSensorStatus(sensor);
+                                        return status === 'alert' || status === 'warning';
+                                      })
+                                      .map(sensor => (
+                                        <div key={sensor.id} className="bg-white p-3 rounded-lg border border-gray-100 hover:border-green-200 transition-colors">
+                                          <div className="flex justify-between items-center">
+                                            <span className="capitalize font-medium text-gray-700">{sensor.type}</span>
+                                            <SensorValue sensor={sensor} />
+                                          </div>
+                                        </div>
+                                      ))}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="bg-white rounded-xl shadow-sm overflow-hidden p-4 border border-green-100">
+                  <MapContainer
+                    center={[35.6895, 139.6917]}
+                    zoom={12}
+                    className="h-96 w-full rounded-lg border border-green-100"
+                  >
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    />
+                    {farms.flatMap(farm => 
+                      farm.zones.map(zone => {
+                        if (!zone.location) return null;
+                        
+                        const hasAlerts = zone.sensors.some(sensor => {
+                          const status = getSensorStatus(sensor);
+                          return status === 'alert' || status === 'warning';
+                        });
+                        
+                        return (
+                          <Marker 
+                            key={zone.id} 
+                            position={zone.location}
+                            icon={hasAlerts ? 
+                              new L.Icon({
+                                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                                iconSize: [25, 41],
+                                iconAnchor: [12, 41]
+                              }) : 
+                              new L.Icon({
+                                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                                iconSize: [25, 41],
+                                iconAnchor: [12, 41]
+                              })
+                            }
+                          >
+                            <Popup className="custom-popup">
+                              <div className="space-y-2">
+                                <h4 className="font-bold text-green-800">{zone.name}</h4>
+                                <p className="text-sm text-gray-600">{farm.name}</p>
+                                {zone.sensors
+                                  .filter(sensor => {
+                                    const status = getSensorStatus(sensor);
+                                    return status === 'alert' || status === 'warning';
+                                  })
+                                  .map(sensor => (
+                                    <div key={sensor.id} className="mt-2 p-2 bg-red-50 rounded border border-red-100">
+                                      <div className="flex justify-between">
+                                        <span className="capitalize font-medium text-red-800">{sensor.type}</span>
+                                        <SensorValue sensor={sensor} />
+                                      </div>
+                                    </div>
+                                  ))}
+                              </div>
+                            </Popup>
+                          </Marker>
+                        );
+                      })
+                    )}
+                  </MapContainer>
+                </div>
+              )}
             </div>
-        </>
-    );
+          </AuthenticatedLayout>
+        </div>
+      </div>
+    </>
+  );
 }
