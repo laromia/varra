@@ -20,12 +20,6 @@ const AlertIcon = () => (
   </svg>
 );
 
-const ClockIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);
-
 const ChevronIcon = ({ className }) => (
   <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -58,7 +52,6 @@ const SensorValue = ({ sensor }) => {
   );
 };
 
-// Helper function to determine sensor status
 const getSensorStatus = (sensor) => {
   const value = sensor.latest_measure?.value;
   if (!value) return 'warning';
@@ -101,7 +94,7 @@ export default function Dashboard({ initialFarms, auth_user_id }) {
 
   useEffect(() => {
     fetchLatestData();
-    const dataInterval = setInterval(fetchLatestData, 30000);
+    const dataInterval = setInterval(fetchLatestData, 3600000);
     return () => clearInterval(dataInterval);
   }, []);
 

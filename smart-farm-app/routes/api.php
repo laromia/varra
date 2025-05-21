@@ -4,9 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\FarmController;
 use App\Http\Controllers\API\ZoneController;
-use App\Http\Controllers\API\SensorController;
 use App\Http\Controllers\API\MeasureController;
 use App\Http\Controllers\API\plantController;
+use App\Http\Controllers\SensorController;
 
 
 // Public auth routes
@@ -19,11 +19,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('farms', FarmController::class);
     Route::apiResource('zones', ZoneController::class);
-    Route::apiResource('sensors', \App\Http\Controllers\SensorController::class);
     Route::apiResource('measures', MeasureController::class);
     Route::get('/farms/{farm}/sensor-data', [FarmController::class, 'getSensorData']);
     Route::get('/zones/{zone}/sensor-data', [ZoneController::class, 'getSensorData']);
-    Route::get('/sensors/{sensor}/measurements', [\App\Http\Controllers\SensorController::class, 'getMeasurements']);
     Route::get('/plant-types', [plantController::class, 'getPlantTypes']);
     Route::delete('/zones/{zone}', [ZoneController::class, 'destroy']);
 
@@ -34,5 +32,11 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
   
+});
+Route::middleware('auth')->group(function () {
+    Route::get('/sensors', [SensorController::class, 'index']);
+    Route::post('/sensors', [SensorController::class, 'store']);
+    Route::get('/sensors/create', [SensorController::class, 'create']);
+    Route::get('/sensors/zone/{zone}', [SensorController::class, 'showByZone']);
 });
 

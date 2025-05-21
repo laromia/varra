@@ -4,56 +4,91 @@ namespace App\Http\Controllers;
 
 use App\Models\Sensor;
 use App\Models\Zone;
-use App\Models\Farm;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class SensorController extends Controller
 {
-    public function index()
-    {
-        $farms = auth()->user()->farms()->with(['zones' => function($query) {
-            $query->withCount('sensors');
-        }])->get();
+   public function index()
+{
+    $farms = auth()->user()->farms()->with(['zones' => function($query) {
+        $query->withCount('sensors')->with('sensors');
+    }])->get();
 
-        return Inertia::render('Sensors/Index', [
-            'farms' => $farms
-        ]);
-    }
+    return Inertia::render('Sensors/Index', [
+        'farms' => $farms
+    ]);
+}
 
     public function create()
     {
-        $farms = auth()->user()->farms()->with(['zones.plantTypes'])->get();
-        
-        return Inertia::render('Sensors/Create', [
-            'farms' => $farms
-        ]);
+        $farms = auth()->user()->farms()->with('zones')->get();
+        return Inertia::render('Sensors/Create', compact('farms'));
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'zone_id' => 'required|exists:zones,id',
             'type' => 'required|in:temperature,humidity,soil_moisture',
             'identifier_code' => 'required|unique:sensors',
-            'position' => 'nullable|string',
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
-            'plant_type_id' => 'nullable|exists:plant_types,id'
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
         ]);
 
-        Sensor::create($validated);
+        Sensor::create($request->all());
 
-        return redirect()->route('sensors.index')
-            ->with('success', 'Sensor created successfully!');
+        return redirect()->route('sensors.index')->with('success', 'Sensor added!');
     }
 
     public function showByZone(Zone $zone)
     {
-        $zone->load(['sensors', 'farm']);
-        
-        return Inertia::render('Sensors/ZoneSensors', [
-            'zone' => $zone
-        ]);
+        $zone->load('sensors', 'farm');
+        return Inertia::render('Sensors/ZoneSensors', compact('zone'));
     }
+    public function edit(Sensor $sensor)
+{
+    $sensor->load('zone.farm');
+    $farms = auth()->user()->farms()->with('zones')->get();
+    
+    return Inertia::render('Sensors/Edit', [
+        'sensor' => $sensor,
+        'farms' => $farms
+    ]);
+}
+public function showMeasures(Sensor $sensor)
+{
+    $measures = $sensor->measures()->with('plantType')->latest()->paginate(20);
+    
+    return Inertia::render('Sensors/Measures', [
+        'sensor' => $sensor,
+        'measures' => $measures
+    ]);
+}
+
+
+public function update(Request $request, Sensor $sensor)
+{
+    $validated = $request->validate([
+        'zone_id' => 'required|exists:zones,id',
+        'type' => 'required|in:temperature,humidity,soil_moisture',
+        'identifier_code' => 'required|unique:sensors,identifier_code,'.$sensor->id,
+        'position' => 'nullable|string',
+        'latitude' => 'required|numeric|between:-90,90',
+        'longitude' => 'required|numeric|between:-180,180',
+    ]);
+
+    $sensor->update($validated);
+
+    return redirect()->route('sensors.index')
+        ->with('success', 'Sensor updated successfully!');
+}
+
+public function destroy(Sensor $sensor)
+{
+    $sensor->delete();
+    
+    return redirect()->route('sensors.index')
+        ->with('success', 'Sensor deleted successfully!');
+}
 }
